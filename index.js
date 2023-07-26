@@ -14,7 +14,7 @@ app.use('/api/customers', customerRoute)
 app.use('/api/admins', adminRoute)
 app.use('/api/qrcodes', qrcodes)
 app.use('/api/qrcodeMenu', qrcodeMenu)
-app.use('/api/qrcodes', generatorRouter);
+app.use('/api/generateqrcodes', generatorRouter);
 
 
 
