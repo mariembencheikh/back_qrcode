@@ -3,15 +3,13 @@ const mongoose = require('mongoose')
 
 const app = express()
 app.use(express.json())
-
-const customerRoute = require('./routes/customer')
-const adminRoute = require('./routes/admin')
+const userRoute = require('./routes/users')
+const authRoute = require('./routes/auth')
 const qrcodes = require('./routes/qrcode')
 const qrcodeMenu = require('./routes/qrcoemenu')
 const generatorRouter = require('./controllers/generatorQRCode') 
-
-app.use('/api/customers', customerRoute)
-app.use('/api/admins', adminRoute)
+app.use('/api/users',userRoute)
+app.use('/api/auth',authRoute)
 app.use('/api/qrcodes', qrcodes)
 app.use('/api/qrcodeMenu', qrcodeMenu)
 app.use('/api/generateqrcodes', generatorRouter);
