@@ -1,8 +1,11 @@
 const express = require('express')
+const cors = require('cors');
 const mongoose = require('mongoose')
 
 const app = express()
+app.use(cors());
 app.use(express.json())
+
 const userRoute = require('./routes/users')
 const authRoute = require('./routes/auth')
 const qrcodes = require('./routes/qrcode')
