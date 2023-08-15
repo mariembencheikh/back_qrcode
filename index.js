@@ -1,11 +1,11 @@
 const express = require('express')
 const cors = require('cors');
 const mongoose = require('mongoose')
-
+const bodyParser = require('body-parser');
 const app = express()
 app.use(cors());
 app.use(express.json())
-
+app.use(bodyParser.json());
 const userRoute = require('./routes/users')
 const authRoute = require('./routes/auth')
 const qrcodes = require('./routes/qrcode')
@@ -16,6 +16,14 @@ app.use('/api/auth',authRoute)
 app.use('/api/qrcodes', qrcodes)
 app.use('/api/qrcodeMenu', qrcodeMenu)
 app.use('/api/generateqrcodes', generatorRouter);
+app.use((req, res, next) => {
+  // Simulating user authentication for testing purposes
+  req.user = { _id: 'user_id' };
+  next();
+  
+});
+
+
 
 
 

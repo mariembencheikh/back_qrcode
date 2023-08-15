@@ -1,5 +1,3 @@
-// Fichier : qrcodemenu.js
-
 const express = require('express');
 const router = express.Router();
 const QRCodeMenu = require('../models/QRCodeMenu');

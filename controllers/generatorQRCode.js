@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const qrcode = require('qrcode');
 const multer = require('multer');
-
+const authMiddleware = require('../middleware/auth');
 const QRCode = require('../models/QRCode');
 const QRCodeContact = require('../models/QRCodeContact');
 const QRCodeMenu = require('../models/QRCodeMenu');
@@ -30,10 +30,11 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-router.post('/generate', upload.single('pdfFile'), async (req, res) => {
+router.post('/generate', authMiddleware,upload.single('pdfFile'), async (req, res) => {
     try {
 
         const { type, link, logo } = req.body;
+   
         if (type !== 'menu' && type !== 'contact') {
             return res.status(400).json({ error: 'Type de QR Code non pris en charge' });
         }
@@ -48,8 +49,8 @@ router.post('/generate', upload.single('pdfFile'), async (req, res) => {
                     code: '',
                     type: 'menu',
                     logo: logo,
-                    file: fileURL
-
+                    file: fileURL,
+                    user:  req.user ,
                 });
                 await QRCodeMenu.create({
                     qrCodeMenu: qrCode._id,
@@ -59,6 +60,7 @@ router.post('/generate', upload.single('pdfFile'), async (req, res) => {
                     logo: logo
                 });
             }
+            
 
         } else if (type === 'contact') {
             qrCode = await QRCode.create({

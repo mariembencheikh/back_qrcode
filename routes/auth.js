@@ -3,7 +3,7 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
 
-
+//Register
 router.post("/register", async (req, res) => {
   const email = req.body.email;
   try {
@@ -47,7 +47,7 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Wrong Password or Email" });
     }
 
-    const token = jwt.sign({ userId: user._id }, 'secret_key');
+    const token = jwt.sign({ userId: user._id }, 'secretkey');
     console.log("token: ", token);
     res.status(200).json({ user, token });
 
@@ -55,6 +55,8 @@ router.post("/login", async (req, res) => {
     res.status(500).json({error: err});
   }
 });
+
+
 
 
 module.exports = router;

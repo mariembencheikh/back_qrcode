@@ -1,16 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const QRCode = require('../models/QRCode');
-
+const authMiddleware = require('../middleware/auth');
 // Créer un QRCode
-router.post('/addqrcodes', async (req, res) => {
+router.post('/add', authMiddleware,async (req, res) => {
   try {
-    const { code, type, logo, created_by } = req.body;
+    const { code, type, logo,user, created_by } = req.body;
     const qrcode = new QRCode({
      
       code,
       type,
       logo,
+      user,
       created_by
     });
     const result = await qrcode.save();
@@ -21,8 +22,17 @@ router.post('/addqrcodes', async (req, res) => {
   }
 });
 
-// Obtenir tous les QRCodes
-router.get('/qrcodes', async (req, res) => {
+// Obtenir tous les QRCodes by user
+router.get('/qrcodes', authMiddleware,async (req, res) => {
+  try {
+    const qrcodes = await QRCode.find({user: req.user});
+    res.json(qrcodes);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+// Obtenir tous les QRCodes 
+router.get('/allqrcodes',async (req, res) => {
   try {
     const qrcodes = await QRCode.find();
     res.json(qrcodes);
@@ -30,7 +40,6 @@ router.get('/qrcodes', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
 // Obtenir un QRCode par ID
 router.get('/qrcodes/:id', async (req, res) => {
   try {
