@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const QRCode = require('../models/QRCode');
-const authMiddleware = require('../middleware/auth');
+const authMiddleware = require('../midellware/auth');
 // Créer un QRCode
 router.post('/add', authMiddleware,async (req, res) => {
   try {
