@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const QRCodeMenu = require('../models/QRCodeMenu');
+const authMiddleware = require('../midellware/auth');
 
 // Créer un qrCodeMenu
 router.post('/qrcodemenu', async (req, res) => {
@@ -20,7 +21,7 @@ router.post('/qrcodemenu', async (req, res) => {
 });
 
 // Obtenir tous les qrCodeMenu
-router.get('/qrcodemenu', async (req, res) => {
+router.get('/qrcodemenu',async (req, res) => {
   try {
     const qrcodemenu = await QRCodeMenu.find();
     res.json(qrcodemenu);

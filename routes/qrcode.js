@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const QRCode = require('../models/QRCode');
+const QRCodeMenu = require('../models/QRCodeMenu');
 const authMiddleware = require('../midellware/auth');
 // Créer un QRCode
 router.post('/add', authMiddleware,async (req, res) => {
@@ -26,7 +27,12 @@ router.post('/add', authMiddleware,async (req, res) => {
 router.get('/qrcodes', authMiddleware,async (req, res) => {
   try {
     const qrcodes = await QRCode.find({user: req.user});
-    res.json(qrcodes);
+    const qrcodeDetails = await Promise.all(qrcodes.map(async (qrcode) => {
+      const qrcodeMenu = await QRCodeMenu.findOne({ qrCode: qrcode._id });
+      return { qrcode, qrcodeMenu };
+    }));
+    res.json(qrcodeDetails);
+    console.log(qrcodes);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

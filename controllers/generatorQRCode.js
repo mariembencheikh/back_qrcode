@@ -53,7 +53,7 @@ router.post('/generate', authMiddleware,upload.single('pdfFile'), async (req, re
                     user:  req.user ,
                 });
                 await QRCodeMenu.create({
-                    qrCodeMenu: qrCode._id,
+                    qrCode: qrCode._id,
                     restaurant: req.body.restaurant,
                     link,
                     file: fileURL,
@@ -95,7 +95,7 @@ router.get('/redirect/:type/:id', async (req, res) => {
 
         let qrCode;
         if (type === 'menu') {
-            qrCode = await QRCodeMenu.findOne({ qrCodeMenu: id });
+            qrCode = await QRCodeMenu.findOne({ qrCode: id });
         } else if (type === 'contact') {
             qrCode = await QRCodeContact.findOne({ qrCodeContact: id });
         }

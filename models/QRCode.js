@@ -8,7 +8,9 @@ const qrCodeSchema = new mongoose.Schema(
         type: mongoose.Types.ObjectId,
         ref:'User',
       },
-      created_by: { type: mongoose.Types.ObjectId, ref: "Customer" },
+      
+      
+      
     },
     { timestamps: true }
   );
