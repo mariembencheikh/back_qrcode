@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
+const authMiddleware = require('../midellware/auth');
 
 
 //post
@@ -67,23 +68,15 @@ router.put("/:id", async (req, res) => {
       res.status(401).json("You can delete only your account!");
     }
   });
-  //Get User
-router.get('/:id', async (req, res) => {
+  
+  
+  // Get customers by role
+  router.get('/all', authMiddleware, async (req, res) => {
     try {
-    const user = await User.findById(req.params.id)
-    const { password, ...others } = user._doc
-    res.status(200).json(others)
-    } catch (err) {
-    res.status(500).json("user not found")
-    }
-})
-  //Get customer
-  router.get("/customers", async (req, res) => {
-    try {
-      let customers;
-      customers = await User.find({
+      
+      const customers = await User.find({
         role: "Customer",
-      });
+      }).select('-password');
   
       res.status(200).json(customers);
     } catch (err) {
@@ -91,6 +84,20 @@ router.get('/:id', async (req, res) => {
     }
   });
 
+  
+  router.get('/:id', async (req, res) => {
+    try {
+      const user = await User.findById(req.params.id).select('-password');
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      const { password, ...others } = user._doc;
+      res.status(200).json(others);
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  });
+  
 router.get('/logout',  function (req, res, next)  {
     // If the user is loggedin
     if (req.session.email) {
