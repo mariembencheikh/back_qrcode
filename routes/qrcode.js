@@ -32,7 +32,7 @@ router.get('/qrcodes', authMiddleware,async (req, res) => {
       return { qrcode, qrcodeMenu };
     }));
     res.json(qrcodeDetails);
-    console.log(qrcodes);
+    
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

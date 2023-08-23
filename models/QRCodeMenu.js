@@ -4,7 +4,6 @@ const qrCodeMenuSchema = new mongoose.Schema(
     {
       qrCode: { type: mongoose.Types.ObjectId, ref: "QRCode" },
       restaurant:String,
-      link:String,
       file:String,
     },
     { timestamps: true },
