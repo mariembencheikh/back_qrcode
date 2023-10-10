@@ -24,8 +24,9 @@ const storage = multer.diskStorage({
     },
     filename: function (req, file, cb) {
         // Générez un nom de fichier unique en ajoutant un timestamp au nom du fichier d'origine
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, file.fieldname + '-' + uniqueSuffix + '.pdf');
+      //  const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+       // cb(null, file.fieldname + '-' + uniqueSuffix + '.pdf');
+       cb(null, file.originalname);
     }
 });
 const upload = multer({ storage: storage });
