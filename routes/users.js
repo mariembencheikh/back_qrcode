@@ -69,7 +69,27 @@ router.put("/:id", async (req, res) => {
     }
   });
   
-  
+  //post customer
+router.post('/addCustomer', async (req, res) => {
+  try {
+    const salt = await bcrypt.genSalt(10)
+    const hashedPass = await bcrypt.hash(req.body.password, salt)
+    const newUser = new User({
+      firstname: req.body.firstname,
+      lastname: req.body.lastname,
+      email: req.body.email,
+      password: hashedPass,
+      role:"Customer",
+      phoneNumber: req.body.phoneNumber,
+      country : req.body.country,
+             
+    })
+    const user = await newUser.save()
+    res.status(200).json(user)
+  } catch (err) {
+    res.status(500).json(err)
+  }
+})
   // Get customers by role
   router.get('/all', authMiddleware, async (req, res) => {
     try {

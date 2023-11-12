@@ -29,7 +29,8 @@ router.get('/qrcodes', authMiddleware,async (req, res) => {
     const qrcodes = await QRCode.find({user: req.user});
     const qrcodeDetails = await Promise.all(qrcodes.map(async (qrcode) => {
       const qrcodeMenu = await QRCodeMenu.findOne({ qrCode: qrcode._id });
-      return { qrcode, qrcodeMenu };
+      return { qrcode, qrcodeMenu};
+     
     }));
     res.json(qrcodeDetails);
     
@@ -42,7 +43,7 @@ router.get('/allqrcodes',async (req, res) => {
   try {
     const qrcodes = await QRCode.find();
     const qrcodeDetails = await Promise.all(qrcodes.map(async (qrcode) => {
-      const qrcodeMenu = await QRCodeMenu.findOne({ qrCode: qrcode._id });
+    const qrcodeMenu = await QRCodeMenu.findOne({ qrCode: qrcode._id });
       return { qrcode, qrcodeMenu };
     }));
     res.json(qrcodeDetails);
@@ -92,6 +93,7 @@ router.put('/qrcodes/:id' , authMiddleware, async (req, res) => {
     }
     
   res.json(updatedQRCode);
+  console.log(updatedQRCode);
     
   } catch (error) {
     res.status(500).json({ error: error.message });

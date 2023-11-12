@@ -3,8 +3,16 @@ const cors = require('cors');
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser');
 const app = express()
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'http://localhost:5002');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  next();
+});
 app.use(cors());
 app.use(express.json())
+//pour afficher l'image en front
+app.use('/uploads', express.static('uploads'));
+
 app.use(bodyParser.json());
 const userRoute = require('./routes/users')
 const authRoute = require('./routes/auth')

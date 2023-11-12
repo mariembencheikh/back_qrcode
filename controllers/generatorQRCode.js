@@ -9,8 +9,10 @@ const QRCodeMenu = require('../models/QRCodeMenu');
 
 async function generateQRCode(link) {
     try {
-        const qrCodeDataUrl = await qrcode.toDataURL(link);
-        return qrCodeDataUrl;
+        const qrCode = await qrcode.toDataURL(link);
+        console.log(qrCode);
+
+        return qrCode;
     } catch (error) {
         console.error('Une erreur s\'est produite lors de la génération du code QR :', error);
         throw error;
@@ -24,18 +26,20 @@ const storage = multer.diskStorage({
     },
     filename: function (req, file, cb) {
         // Générez un nom de fichier unique en ajoutant un timestamp au nom du fichier d'origine
-      //  const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-       // cb(null, file.fieldname + '-' + uniqueSuffix + '.pdf');
-       cb(null, file.originalname);
+       //const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+       //cb(null, file.fieldname + '-' + uniqueSuffix + '.pdf');
+      cb(null, file.originalname);
     }
 });
 const upload = multer({ storage: storage });
 
-router.post('/generate', authMiddleware,upload.single('pdfFile'), async (req, res) => {
+
+
+router.post('/generate', authMiddleware,upload.fields([{ name: 'pdfFile' }, { name: 'logo' }]), async (req, res) => {
     try {
 
-        const { type, logo } = req.body;
-        console.log(type);
+        const type = req.body.type;
+        console.log("type====",type);
         if (type !== 'menu' && type !== 'contact') {
             return res.status(400).json({ error: 'Type de QR Code non pris en charge' });
         }
@@ -45,29 +49,27 @@ router.post('/generate', authMiddleware,upload.single('pdfFile'), async (req, re
         let redirectUrl='';
 
         if (type === 'menu') {
-            if (req.file) {
-                const fileURL = req.file.path; // Le chemin d'accès du fichier danst fileURL = req.file.path; // Le chemin d'accès du fichier dans
-                console.log(fileURL);
+            
+                const filePath = req.files['pdfFile'][0].path; // Chemin du fichier du menu
+                const logoPath = req.files['logo'][0].path; // Le chemin d'accès du fichier danst fileURL = req.file.path; // Le chemin d'accès du fichier dans
                 qrCode = await QRCode.create({
                     code: '',
                     type: 'menu',
-                    logo: logo,
-                    file: fileURL,
+                    logo: logoPath,
                     user:  req.user ,
                 });
                 await QRCodeMenu.create({
                     qrCode: qrCode._id,
                     restaurant: req.body.restaurant,
-                    file: fileURL,
-                    logo: logo
+                    file: filePath,
                 });
-             }
+            
         } else if (type === 'contact') {
             qrCode = await QRCode.create({
                 code: '',
                 type: 'contact',
-                logo: logo,
-                file: fileURL
+                logo: logoPath,
+                file: filePath
 
             });
             await QRCodeContact.create({
@@ -79,15 +81,16 @@ router.post('/generate', authMiddleware,upload.single('pdfFile'), async (req, re
             });
         }
 
-        qrCodeDataUrl = await generateQRCode(`http://192.168.1.4:5002/api/generateqrcodes/${type}/${qrCode._id}`);
-        
-         redirectUrl = `http://192.168.1.4:5002/api/generateqrcodes/${type}/${qrCode._id}`;
+        qrCodeDataUrl = await generateQRCode(`http://192.168.100.185:3000/api/generateqrcodes/${type}/${qrCode._id}`);
+       redirectUrl = `http://192.168.100.185:3000/api/generateqrcodes/${type}/${qrCode._id}`;
+       //redirectUrl = `http://192.168.100.185:3000/api/generateqrcodes/${type}/${qrCode._id}`;
+        console.log(redirectUrl);
         qrCode.code = qrCodeDataUrl;
-        qrCode.link = redirectUrl;
+       qrCode.link = redirectUrl;
         await qrCode.save();
         
-        res.json({ qrCodeDataUrl, redirectUrl });
-        console.log(redirectUrl);
+        res.json({ qrCodeDataUrl,redirectUrl });
+        //console.log(redirectUrl);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -98,23 +101,16 @@ router.get('/:type/:id', async (req, res) => {
         const { type, id } = req.params;
         const qrCode=await QRCode.findOne({_id:id})
         let typeQrCode;
-        let detailsPage;
+      
         if (type === 'menu') {
             typeQrCode = await QRCodeMenu.findOne({ qrCode: id });
-            detailsPage = `<h1>Menu QR Code Details</h1>
-            <p>Restaurant: ${typeQrCode.restaurant}</p>
-            <p>Link: ${qrCode.link}</p>
-            <p>Menu: ${typeQrCode.file}</p>`;
+           
 
         } else if (type === 'contact') {
             typeQrCode = await QRCodeContact.findOne({ qrCodeContact: id });
-            detailsPage = `<h1>Contact QR Code Details</h1>
-            <p>First Name: ${typeQrCode.firstName}</p>
-            <p>Last Name: ${typeQrCode.lastName}</p>
-            <p>Email: ${typeQrCode.email}</p>
-            <p>Phone Number: ${typeQrCode.phoneNumber}</p>`;
+           
         }
-        res.send(detailsPage);
+        res.send(typeQrCode);
 
         if (!typeQrCode) {
             return res.status(404).json({ error: 'QR Code introuvable' });
